@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SipUp - Privacy Policy & Data Security Compliance</title>
+    <style>
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --text-main: #334155;
+            --text-heading: #0f172a;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --accent: #7c3aed;
+            --accent-bg: rgba(124, 58, 237, 0.08);
+            --accent-border: rgba(124, 58, 237, 0.15);
+            --text-accent: #6d28d9;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --transition: all 0.25s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --border-color: #334155;
+            --text-main: #cbd5e1;
+            --text-heading: #f8fafc;
+            --primary: #3b82f6;
+            --primary-hover: #60a5fa;
+            --accent: #a78bfa;
+            --accent-bg: rgba(167, 139, 250, 0.1);
+            --accent-border: rgba(167, 139, 250, 0.2);
+            --text-accent: #c084fc;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.75;
+            padding: 0;
+            transition: var(--transition);
+        }
+
+        /* Reading Progress Indicator */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 0%;
+        }
+
+        /* Top Header Navigation for Actions */
+        .top-nav {
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 99;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .brand-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text-heading);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background: var(--border-color);
+            color: var(--text-heading);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            color: #ffffff;
+        }
+
+        /* Layout Structure */
+        .layout-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+        }
+
+        /* Sidebar Navigation & Widgets */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: calc(100vh - 140px);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding-right: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .widget-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .widget-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-main);
+            opacity: 0.7;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-item a {
+            display: block;
+            padding: 8px 12px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            transition: var(--transition);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .toc-item a:hover {
+            background: var(--bg-primary);
+            color: var(--primary);
+            padding-left: 16px;
+        }
+
+        .toc-item.active a {
+            background: var(--accent-bg);
+            color: var(--text-accent);
+            font-weight: 600;
+            border-left: 3px solid var(--accent);
+        }
+
+        /* Search input styling */
+        .search-wrapper {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 12px 10px 34px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Main Content Styling */
+        .content-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 48px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .doc-header {
+            text-align: center;
+            margin-bottom: 36px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-heading);
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .last-updated {
+            font-size: 0.8rem;
+            color: var(--text-main);
+            opacity: 0.8;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            background: var(--bg-primary);
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Summary Dashboard Grid */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 36px;
+        }
+
+        .summary-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .summary-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+        }
+
+        .summary-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        .summary-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-heading);
+            margin-bottom: 4px;
+        }
+
+        .summary-desc {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* Section Headings */
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-top: 40px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            scroll-margin-top: 90px; /* Offset for sticky nav */
+        }
+
+        h2::before {
+            content: "";
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        p {
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            text-align: justify;
+            text-justify: inter-word;
+        }
+
+        .highlight {
+            color: var(--text-heading);
+            font-weight: 700;
+            background-color: var(--accent-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* System Permissions List */
+        .permission-list {
+            list-style: none;
+            margin-bottom: 32px;
+        }
+
+        .permission-item {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: var(--transition);
+        }
+
+        .permission-item:hover {
+            border-color: var(--accent);
+            background: var(--bg-card);
+        }
+
+        .badge {
+            display: inline-flex;
+            background: var(--accent-bg);
+            color: var(--text-accent);
+            border: 1px solid var(--accent-border);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            word-break: break-all;
+        }
+
+        .permission-item p {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+
+        /* Generic Lists */
+        .generic-list {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 24px;
+        }
+
+        .generic-list li {
+            margin-bottom: 16px;
+            padding-left: 18px;
+            border-left: 3px solid var(--accent);
+            font-size: 0.92rem;
+        }
+
+        .contact-box {
+            background: var(--accent-bg);
+            border: 1px solid var(--accent-border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .contact-email {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.1rem;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            transition: var(--transition);
+        }
+
+        .contact-email:hover {
+            color: var(--primary-hover);
+            transform: scale(1.02);
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 44px;
+            height: 44px;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 100;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--primary-hover);
+            transform: translateY(-3px);
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
+            .layout-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+                padding: 24px 16px;
+            }
+
+            .sidebar {
+                display: none; /* Hide sidebar on mobile/tablet */
+            }
+
+            .content-card {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .top-nav {
+                padding: 12px 16px;
+            }
+
+            .btn span {
+                display: none; /* Hide button text on micro viewports */
+            }
+
+            .btn {
+                padding: 8px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Print Specific Styling */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .top-nav, .sidebar, .back-to-top, .progress-container {
+                display: none !important;
+            }
+            .layout-container {
+                grid-template-columns: 1fr;
+                padding: 0;
+            }
+            .content-card {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+            }
+            .permission-item {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Scroll Progress Indicator -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Interactive Header Bar -->
+    <header class="top-nav">
+        <div class="brand-title">
+            <span class="brand-dot"></span>
+            SipUp Tracker
+        </div>
+        <div class="nav-actions">
+            <!-- Theme Toggle Button -->
+            <button class="btn" id="themeToggle" aria-label="Toggle Theme">
+                <svg id="sunIcon" style="display:none; width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path></svg>
+                <svg id="moonIcon" style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                <span>Theme</span>
+            </button>
+            <!-- Print/PDF Button -->
+            <button class="btn" onclick="window.print()">
+                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                <span>Print PDF</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="layout-container">
+        
+        <!-- Sidebar Navigation (Desktop Mode Only) -->
+        <aside class="sidebar">
+            <!-- Search Clause Widget -->
+            <div class="widget-panel">
+                <div class="widget-title">Search Content</div>
+                <div class="search-wrapper">
+                    <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="policySearch" class="search-input" placeholder="Search parameters...">
+                </div>
+            </div>
+
+            <!-- Table of Contents Widget -->
+            <nav class="widget-panel">
+                <div class="widget-title">Quick Navigation</div>
+                <ul class="toc-list">
+                    <li class="toc-item active" data-target="section-1"><a href="#section-1">1. Privacy Commitment</a></li>
+                    <li class="toc-item" data-target="section-2"><a href="#section-2">2. Manifest Permissions</a></li>
+                    <li class="toc-item" data-target="section-3"><a href="#section-3">3. Advertisements & SDKs</a></li>
+                    <li class="toc-item" data-target="section-4"><a href="#section-4">4. CCPA & GDPR Rights</a></li>
+                    <li class="toc-item" data-target="section-5"><a href="#section-5">5. COPPA Compliance</a></li>
+                    <li class="toc-item" data-target="section-6"><a href="#section-6">6. Information Security</a></li>
+                    <li class="toc-item" data-target="section-7"><a href="#section-7">7. Changes to Policy</a></li>
+                    <li class="toc-item" data-target="section-8"><a href="#section-8">8. Contact & Redressal</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content-card">
+            
+            <header class="doc-header">
+                <h1>Privacy Policy</h1>
+                <div class="last-updated">Effective Date: July 21, 2026</div>
+            </header>
+
+            <section class="policy-block">
+                <p>This Privacy Policy governs the manner in which <span class="highlight">Developer Santosh</span> (referred to as the "Developer", "We", "Us", or "Our") collects, uses, maintains, and discloses information collected from users (each, a "User") of the <span class="highlight">SipUp: Water & Meds Tracker</span> mobile application (referred to as the "App" or "Application"). This document constitutes a legally binding agreement under global data privacy regulations and Google Play Store developer guidelines.</p>
+            </section>
+
+            <!-- Summary Highlights Panel -->
+            <section class="summary-grid">
+                <div class="summary-card">
+                    <span class="summary-icon">🔒</span>
+                    <div class="summary-title">Data Sovereignty</div>
+                    <div class="summary-desc">100% Secure Local Sandbox Storage</div>
+                </div>
+                <div class="summary-card">
+                    <span class="summary-icon">🛡️</span>
+                    <div class="summary-title">Compliance</div>
+                    <div class="summary-desc">GDPR, CCPA, and COPPA Aligned</div>
+                </div>
+                <div class="summary-card">
+                    <span class="summary-icon">☁️</span>
+                    <div class="summary-title">No Cloud Server</div>
+                    <div class="summary-desc">Zero tracking records uploaded</div>
+                </div>
+            </section>
+
+            <section id="section-1" class="policy-block">
+                <h2>1. Privacy-First Commitment & Local Data Sandboxing</h2>
+                <p>SipUp operates strictly as a localized productivity and wellness assistant. We believe in absolute user data sovereignty. <span class="highlight">All logging histories, medication schedules, custom reminders, and daily progress trends are processed and stored locally on your device</span> inside secure sandbox environments utilizing SQLite and LocalStorage structures [1.3.1]. We do not maintain, manage, or host any external servers to retrieve, upload, or process your personal health records [1.3.1]. Your raw data never leaves your physically owned device.</p>
+            </section>
+
+            <section id="section-2" class="policy-block">
+                <h2>2. Android System Manifest Permissions Disclosure</h2>
+                <p>To deliver advanced alert integrations, automated local backup systems, and real-time geographical climate target updates, SipUp requires specific system manifest permissions. Below is the full, mathematically and technically justified audit of our requested APIs [1.3.1]:</p>
+                
+                <div class="permission-list">
+                    <div class="permission-item">
+                        <span class="badge">android.permission.ACCESS_FINE_LOCATION</span>
+                        <p>Grants access to high-accuracy satellite-based GPS coordinates. This coordinate parsing is executed strictly in the foreground. The coordinate data is transmitted securely to the open-source Open-Meteo meteorological API strictly to calculate local temperatures. This calculation determines the real-time hydration coefficient needed to adjust your daily intake target during intense local weather shifts. Location data is never stored locally or transmitted to private cloud servers [1.3.1].</p>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <span class="badge">android.permission.ACCESS_COARSE_LOCATION</span>
+                        <p>Allows approximate network-based tracking coordinates when GPS satellite signals are obstructed, ensuring seamless fallbacks for the climate target adjustment system.</p>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <span class="badge">android.permission.POST_NOTIFICATIONS</span>
+                        <p>Required under Android 13+ rules to deliver high-priority system alerts, schedule reminders, and custom pill schedules to your notification shelf [1.3.1].</p>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <span class="badge">android.permission.SCHEDULE_EXACT_ALARM</span>
+                        <p>Bypasses Android system battery-saving standby cycles (Doze Mode). This ensures that custom medicine schedules and water tracking timers are executed precisely at the exact microsecond configured, eliminating background delays [1.3.1].</p>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <span class="badge">android.permission.RECEIVE_BOOT_COMPLETED</span>
+                        <p>Listens to the operating system's startup completion broadcast. This permission is critical to re-initialize your local database-linked reminders and securely reschedule your alarms after your mobile device reboots.</p>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <span class="badge">android.permission.WAKE_LOCK</span>
+                        <p>Allows our explicit alarm receiver to briefly hold CPU processes awake. This prevents the OS from suspending active processes, ensuring that our localized custom Hindi/English voice packs play completely and clearly when an alarm fires.</p>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <span class="badge">android.permission.VIBRATE</span>
+                        <p>Allows the app to trigger localized physical haptic feedback when alerts fire, aiding accessibility when sounds are muted.</p>
+                    </div>
+                    
+                    <div class="permission-item">
+                        <span class="badge">android.permission.INTERNET</span>
+                        <p>Grants network socket access to process localized temperature requests and sync storage configurations.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-3" class="policy-block">
+                <h2>3. Advertisements, SDK Telemetry & AdMob Compliance</h2>
+                <p>SipUp integrates the <span class="highlight">Google AdMob SDK</span> to dynamically render non-intrusive advertisements (banners, interstitials, and rewarded videos) [1.3.1]. This model allows us to offer all features completely free of charge [1.3.1]. The integrated AdMob SDK may query, process, and transmit specific parameters to ensure safety and ad relevance [1.3.1]:</p>
+                <ul class="generic-list">
+                    <li>Device manufacturer details, operating system version, network carrier, screen dimensions, and locale configurations.</li>
+                    <li>Anonymous mobile advertising identifiers (such as Google Play Advertising ID / AAID).</li>
+                    <li>Diagnostics metrics, ad interaction timestamps, and click telemetry.</li>
+                </ul>
+                <p>AdMob uses this anonymous profiling strictly to deliver region-relevant advertisements and protect against click fraud, strictly adhering to Google Family Policy and COPPA regulations [1.3.1].</p>
+            </section>
+
+            <section id="section-4" class="policy-block">
+                <h2>4. California Consumer Privacy Act (CCPA) & GDPR Rights</h2>
+                <p>Under the European General Data Protection Regulation (GDPR) and California Consumer Privacy Act (CCPA), users hold absolute rights regarding their data. Since SipUp is designed with local storage sandboxing, your rights are fully guaranteed by design [1.3.1]:</p>
+                <ul class="generic-list">
+                    <li><span class="highlight">Right to Access/Portability:</span> You have full local access to your entire data history inside the app interface, and you can export it to your device's downloads folder as a standard CSV file at any time [1].</li>
+                    <li><span class="highlight">Right to Erasure (Delete Data):</span> You can permanently purge all stored water logs, custom reminders, and streaks instantly using the "Reset Daily Intake" option in settings or by deleting the App's local storage via your system settings [1].</li>
+                </ul>
+            </section>
+
+            <section id="section-5" class="policy-block">
+                <h2>5. Children's Online Privacy Protection Act (COPPA) Compliance</h2>
+                <p>SipUp is designed to fully comply with COPPA regulations. We do not knowingly collect, profile, or request personally identifiable information from children under the age of 13 [1.3.1]. All data remains localized within the on-device sandbox. Parents can securely purge all tracking parameters instantly by clearing the application storage [1.3.1].</p>
+            </section>
+
+            <section id="section-6" class="policy-block">
+                <h2>6. Information Security Standards</h2>
+                <p>We implement industry-standard security measures to safeguard your local database context. All file decryptions and relative page redirections are executed in-memory to prevent system file tampering or unauthorized data extraction on custom Android ROMs [1.1.3].</p>
+            </section>
+
+            <section id="section-7" class="policy-block">
+                <h2>7. Changes to this Privacy Policy</h2>
+                <p>We reserve the right to revise or update this Privacy Policy at any time to align with new system SDK releases, Play Store terms, or security audits. Any modifications will be indicated by updating the "Effective Date" at the top of this page. We encourage you to review this page periodically to stay informed about how we safeguard your data privacy.</p>
+            </section>
+
+            <section id="section-8" class="policy-block">
+                <h2>8. Contact & Grievance Redressal</h2>
+                <p>If you have any questions, compliance queries, or require assistance regarding our privacy policies, please reach out directly to the developer support channel:</p>
+                
+                <div class="contact-box">
+                    <p style="margin-bottom:0; font-weight:700;">Grievance & Support Email:</p>
+                    <a href="mailto:sipup.app@gmail.com" class="contact-email">📧 sipup.app@gmail.com</a>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="back-to-top" aria-label="Scroll to top">
+        <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    </button>
+
+    <script>
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        
+        // Load preference from localStorage
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateIcons(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcons(newTheme);
+        });
+
+        function updateIcons(theme) {
+            if (theme === 'dark') {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            } else {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            }
+        }
+
+        // Reading Progress Indicator & Scrollspy logic
+        const progressBar = document.getElementById('progressBar');
+        const sections = document.querySelectorAll('.policy-block[id]');
+        const tocItems = document.querySelectorAll('.toc-item');
+        const backToTop = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            // Scroll Progress
+            const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            progressBar.style.width = scrollPercent + '%';
+
+            // Show/Hide Back to top button
+            if (window.scrollY > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+
+            // Scrollspy logic to highlight active section in table of contents
+            let currentActiveSectionId = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 120; // offset calculation
+                if (window.scrollY >= sectionTop) {
+                    currentActiveSectionId = section.getAttribute('id');
+                }
+            });
+
+            tocItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-target') === currentActiveSectionId) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // Click handler to smooth scroll to element
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Instant Live Search / Filter Policy Clauses
+        const searchInput = document.getElementById('policySearch');
+        searchInput.addEventListener('input', function() {
+            const filterValue = this.value.toLowerCase().trim();
+            const listItems = document.querySelectorAll('.permission-item, .generic-list li, .policy-block p');
+
+            listItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(filterValue)) {
+                    item.style.opacity = '1';
+                    item.style.backgroundColor = ''; // Restore
+                } else {
+                    item.style.opacity = '0.35'; // Visual feedback for match failure
+                }
+            });
+        });
+    </script>
+</body>
+</html>
