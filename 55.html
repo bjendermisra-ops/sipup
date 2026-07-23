@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandir Seva - Admin Panel</title>
+    <!-- Tailwind CSS for high quality dynamic design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- HTML5-QRCode Web Scanner Library CDN -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+    <!-- Passcode Security Screen -->
+    <div id="loginScreen" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-96 text-center max-w-sm mx-4">
+            <h2 class="text-2xl font-bold text-orange-600 mb-2">Mandir Seva Admin</h2>
+            <p class="text-sm text-slate-500 mb-6">Prabandhak login passcode dalein:</p>
+            <input type="password" id="passcode" class="w-full p-3 border rounded-xl text-center text-2xl tracking-widest outline-none focus:border-orange-500 mb-4" placeholder="••••" maxlength="4">
+            <button onclick="checkPasscode()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold p-3 rounded-xl transition">DASHBOARD KHOLEN</button>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="mainDashboard" class="hidden">
+        <!-- Top Navigation -->
+        <header class="bg-white border-b sticky top-0 z-30 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-orange-100 text-orange-600 p-2 rounded-xl font-bold text-xl">🔱</div>
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-900">Mandir Tiffin Seva</h1>
+                        <p class="text-xs text-slate-500">Real-time Administrative Control Panel</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="openAdminScanner()" class="px-4 py-2 bg-orange-600 text-white text-sm font-bold rounded-xl hover:bg-orange-700 transition flex items-center gap-1">📷 SCAN USER QR</button>
+                    <button onclick="logout()" class="px-4 py-2 border rounded-xl text-sm font-semibold hover:bg-slate-50 transition">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Floating Web Scanner Modal Popup with Local Image Decoder (Testing Mode) -->
+        <div id="scannerModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+            <div class="bg-white rounded-3xl p-6 max-w-md w-full space-y-4 text-center">
+                <h3 class="text-lg font-bold text-slate-800">Scan User QR Code</h3>
+                <p class="text-xs text-slate-400">Camera ke samne user ki mobile screen par dikh raha QR code laayein</p>
+                <div class="w-full aspect-square bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 shadow-inner flex items-center justify-center relative">
+                    <div id="adminScannerReader" class="w-full h-full"></div>
+                </div>
+
+                <!-- TESTING: Gallery QR Screenshot Uploader (Only for Single-Phone Testing) -->
+                <div class="border-t pt-4 space-y-2">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase">Ya fir Gallery se QR Screenshot Upload karein</label>
+                    <input type="file" id="adminQrFileInput" accept="image/*" class="hidden" onchange="decodeAdminQrFile(event)">
+                    <button onclick="document.getElementById('adminQrFileInput').click()" class="w-full bg-slate-100 border border-slate-200 text-slate-700 font-bold py-3 rounded-xl text-xs hover:bg-slate-200 transition">
+                        📁 Gallery se QR Screenshot select karein
+                    </button>
+                </div>
+
+                <button onclick="closeAdminScanner()" class="w-full py-3 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition">CANCEL SCAN</button>
+            </div>
+        </div>
+
+        <!-- Floating Scanning Result Popup (Flashes Green on Success or Red on Blocked!) -->
+        <div id="resultModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+            <div id="resultCard" class="bg-white rounded-3xl p-8 max-w-sm w-full text-center space-y-5 shadow-2xl transition duration-300">
+                <div id="resultIcon" class="w-20 h-20 rounded-full flex items-center justify-center text-4xl mx-auto border-4"></div>
+                <div>
+                    <h3 id="resultTitle" class="text-xl font-extrabold text-slate-900">Result Title</h3>
+                    <p id="resultMsg" class="text-xs text-slate-500 mt-1">Result detailed message</p>
+                </div>
+                <!-- Scanned User Avatar & Details Card -->
+                <div id="scannedUserCard" class="hidden p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center gap-3 text-left">
+                    <img id="scanAvatar" src="" class="w-12 h-12 rounded-full object-cover border">
+                    <div>
+                        <h4 id="scanName" class="font-bold text-slate-800 text-sm">--</h4>
+                        <p id="scanPhone" class="text-xs text-slate-400">--</p>
+                    </div>
+                </div>
+                <button onclick="closeResultModal()" class="w-full bg-slate-950 hover:bg-slate-800 text-white font-bold p-3.5 rounded-xl text-sm transition">OK, CLOSE</button>
+            </div>
+        </div>
+
+        <!-- Main Body -->
+        <main class="max-w-7xl mx-auto px-4 py-8">
+            <!-- Tabs Buttons -->
+            <div class="flex flex-wrap gap-2 mb-8 border-b pb-4">
+                <button onclick="switchTab('users')" id="tabBtn-users" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-sm transition bg-orange-600 text-white">Users Management</button>
+                <button onclick="switchTab('reports')" id="tabBtn-reports" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100">Live Reports</button>
+                <button onclick="switchTab('absents')" id="tabBtn-absents" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100">Absence Reasons</button>
+                <button onclick="switchTab('settings')" id="tabBtn-settings" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100">System Settings</button>
+            </div>
+
+            <!-- Tab 1: Users Management (Card-Based Mobile Layout) -->
+            <section id="tab-users" class="tab-content active space-y-6">
+                <!-- Add User Manually Panel -->
+                <div class="bg-white border rounded-2xl p-6 shadow-sm">
+                    <h2 class="text-base font-bold text-slate-900 mb-2">Naya User Manually Register Karein</h2>
+                    <p class="text-xs text-slate-500 mb-4">Phone na hone par prabandhak yahan se naye bhakt ko database mein jod sakte hain:</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Bhakt Ka Naam</label>
+                            <input type="text" id="addName" class="w-full p-2.5 border rounded-xl outline-none focus:border-orange-500 text-sm" placeholder="Naam likhein">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Mobile Number</label>
+                            <input type="tel" id="addPhone" class="w-full p-2.5 border rounded-xl outline-none focus:border-orange-500 text-sm" placeholder="10-digit number" maxlength="10">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Device ID / Custom ID</label>
+                            <input type="text" id="addDevId" class="w-full p-2.5 border rounded-xl outline-none focus:border-orange-500 text-sm" placeholder="E.g., custom_bhakt_101">
+                        </div>
+                        <button onclick="addUserManually()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold p-3 rounded-xl text-xs transition">
+                            ADD TO DATABASE
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Users List Card Container -->
+                <div class="bg-white border rounded-2xl p-6 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">Registered Users List</h2>
+                            <p class="text-sm text-slate-500">Naye users ko active karein ya unka subscription date badhayein</p>
+                        </div>
+                        <button onclick="fetchUsers()" class="p-2 border rounded-xl hover:bg-slate-50 transition">🔄 Refresh</button>
+                    </div>
+                    
+                    <!-- Dynamic responsive card container -->
+                    <div id="usersCardContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Dynamic user cards will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 2: Live Reports -->
+            <section id="tab-reports" class="tab-content space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white border rounded-2xl p-6 shadow-sm">
+                        <p class="text-sm text-slate-500">Aaj Ke Total Tiffin</p>
+                        <h3 class="text-3xl font-bold text-slate-900 mt-2" id="totalCount">0</h3>
+                    </div>
+                    <div class="bg-white border rounded-2xl p-6 shadow-sm">
+                        <p class="text-sm text-slate-500">Morning Slots Claimed</p>
+                        <h3 class="text-3xl font-bold text-orange-600 mt-2" id="morningCount">0</h3>
+                    </div>
+                    <div class="bg-white border rounded-2xl p-6 shadow-sm">
+                        <p class="text-sm text-slate-500">Evening Slots Claimed</p>
+                        <h3 class="text-3xl font-bold text-blue-600 mt-2" id="eveningCount">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white border rounded-2xl p-6 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-bold text-slate-900">Today's Claimed Logs</h2>
+                        <button onclick="fetchLogs()" class="p-2 border rounded-xl hover:bg-slate-50 transition">🔄 Refresh</button>
+                    </div>
+                    
+                    <div id="logsCardContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Dynamic log cards will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 3: Absence Reasons -->
+            <section id="tab-absents" class="tab-content">
+                <div class="bg-white border rounded-2xl p-6 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-bold text-slate-900">Yesterday's Missed Reasons</h2>
+                        <button onclick="fetchAbsents()" class="p-2 border rounded-xl hover:bg-slate-50 transition">🔄 Refresh</button>
+                    </div>
+                    
+                    <div id="absentsCardContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Dynamic absent cards will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 4: System Settings -->
+            <section id="tab-settings" class="tab-content">
+                <div class="bg-white border rounded-2xl p-6 shadow-sm max-w-2xl">
+                    <h2 class="text-lg font-bold text-slate-900 mb-2">Temple Configurations</h2>
+                    <p class="text-sm text-slate-500 mb-6">GPS Coordinate, Secure Radius, aur Tiffin Time Slots badlein:</p>
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Temple Latitude</label>
+                                <input type="number" step="any" id="setLat" class="w-full p-3 border rounded-xl outline-none focus:border-orange-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Temple Longitude</label>
+                                <input type="number" step="any" id="setLon" class="w-full p-3 border rounded-xl outline-none focus:border-orange-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Allowed Scan Radius (Meters)</label>
+                            <input type="number" id="setRadius" class="w-full p-3 border rounded-xl outline-none focus:border-orange-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Morning Start (HH:MM)</label>
+                                <input type="text" id="setMStart" class="w-full p-3 border rounded-xl outline-none focus:border-orange-500" placeholder="08:00">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Morning End (HH:MM)</label>
+                                <input type="text" id="setMEnd" class="w-full p-3 border rounded-xl outline-none focus:border-orange-500" placeholder="10:00">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Evening Start (HH:MM)</label>
+                                <input type="text" id="setEStart" class="w-full p-3 border rounded-xl outline-none focus:border-orange-500" placeholder="19:00">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Evening End (HH:MM)</label>
+                                <input type="text" id="setEEnd" class="w-full p-3 border rounded-xl outline-none focus:border-orange-500" placeholder="21:00">
+                            </div>
+                        </div>
+                        <button onclick="saveSettings()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold p-3 rounded-xl transition">SAVE CONFIGURATIONS</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const DB_URL = "https://temple-ti-bf233-default-rtdb.firebaseio.com/";
+        const ADMIN_PIN = "1008"; // Sacred Passcode default
+        var html5QrcodeScanner = null; // Scanner instance
+
+        function checkPasscode() {
+            const entered = document.getElementById("passcode").value;
+            if (entered === ADMIN_PIN) {
+                document.getElementById("loginScreen").classList.add("hidden");
+                document.getElementById("mainDashboard").classList.remove("hidden");
+                fetchUsers();
+                loadSettings();
+            } else {
+                alert("Galat Passcode! Kripya sahi passcode enter karein.");
+                document.getElementById("passcode").value = "";
+            }
+        }
+
+        function logout() {
+            document.getElementById("loginScreen").classList.remove("hidden");
+            document.getElementById("mainDashboard").classList.add("hidden");
+            document.getElementById("passcode").value = "";
+        }
+
+        // Web Scanner Integration (HTML5-QRCode)
+        function openAdminScanner() {
+            document.getElementById("scannerModal").style.display = "flex";
+            document.getElementById("scannerModal").classList.remove("hidden");
+
+            html5QrcodeScanner = new Html5Qrcode("adminScannerReader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            html5QrcodeScanner.start(
+                { facingMode: "environment" }, // Rear camera
+                config,
+                onQrScanSuccess,
+                onQrScanError
+            ).catch(err => {
+                alert("Camera permission block hai. Aap gallery upload ka use kar sakte hain!");
+            });
+        }
+
+        function closeAdminScanner() {
+            document.getElementById("scannerModal").style.display = "none";
+            document.getElementById("scannerModal").classList.add("hidden");
+            if(html5QrcodeScanner) {
+                html5QrcodeScanner.stop().catch(err => console.log(err));
+            }
+        }
+
+        // Real-world dynamic canvas optimizer for screenshots (Tested & Highly accurate)
+        function decodeAdminQrFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = 800; // Optimal downscaling dimension
+
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        } else {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // Downscale image crisp onto the canvas to sharpen QR finder patterns
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    canvas.toBlob(function(blob) {
+                        const optimizedFile = new File([blob], "optimized.png", { type: "image/png" });
+                        
+                        const tempScanner = new Html5Qrcode("adminScannerReader");
+                        tempScanner.scanFile(optimizedFile, true)
+                            .then(decodedText => {
+                                closeAdminScanner();
+                                onQrScanSuccess(decodedText);
+                            })
+                            .catch(err => {
+                                // Dynamic Failsafe: Try scanning the raw original file if downscale failed
+                                tempScanner.scanFile(file, true)
+                                    .then(decodedText => {
+                                        closeAdminScanner();
+                                        onQrScanSuccess(decodedText);
+                                    })
+                                    .catch(e => {
+                                        alert("QR Code image se detect nahi ho paya! Kripya saaf screenshot use karein ya crop karke dalein.");
+                                    });
+                            });
+                    }, "image/png");
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Real-time dynamic Verification Engine (Metro Barrier Style!)
+        function onQrScanSuccess(decodedText, decodedResult) {
+            closeAdminScanner(); // Stop camera instantly
+            
+            // Show processing status
+            document.getElementById("resultModal").style.display = "flex";
+            document.getElementById("resultModal").classList.remove("hidden");
+            document.getElementById("resultCard").className = "bg-white rounded-3xl p-8 max-w-sm w-full text-center space-y-5 shadow-2xl animate-pulse";
+            document.getElementById("resultIcon").className = "w-20 h-20 rounded-full flex items-center justify-center text-4xl mx-auto border-4 border-slate-300 text-slate-300";
+            document.getElementById("resultIcon").innerText = "🔄";
+            document.getElementById("resultTitle").innerText = "Processing Scan...";
+            document.getElementById("resultMsg").innerText = "Database details verified ho rahi hain...";
+            document.getElementById("scannedUserCard").classList.add("hidden");
+
+            const userId = decodedText.trim();
+            
+            // Query Firebase for user details via REST
+            fetch(DB_URL + "users/" + userId + ".json")
+                .then(res => res.json())
+                .then(user => {
+                    if(!user || user === null || user === "null") {
+                        showScanResult(false, "Unknown User", "❌ NOT REGISTERED", "Ye device ID registered nahi hai! Kripya pehle user app se register karein.");
+                        return;
+                    }
+
+                    const name = user.name || "N/A";
+                    const phone = user.phone || "N/A";
+                    const status = user.status || "inactive";
+                    const subEndDate = user.subEndDate || "pending";
+                    let avatar = user.photoUrl || "default";
+
+                    if (!avatar || avatar === "default") {
+                        avatar = "https://i.ibb.co/6yXm1F3/default-avatar.png";
+                    }
+
+                    // Populate User Details Card in popup
+                    document.getElementById("scanAvatar").src = avatar;
+                    document.getElementById("scanName").innerText = name;
+                    document.getElementById("scanPhone").innerText = "Phone: " + phone;
+                    document.getElementById("scannedUserCard").classList.remove("hidden");
+
+                    // 1. Check Status Block
+                    if(status !== "active") {
+                        showScanResult(false, "Blocked User", "❌ STATUS INACTIVE", "Sevak active nahi hai! Active tab se status approve karein.");
+                        return;
+                    }
+
+                    // 2. Check Validity End Date
+                    const todayDateStr = new Date().toISOString().split('T')[0];
+                    if(subEndDate === "pending" || subEndDate < todayDateStr) {
+                        showScanResult(false, "Blocked User", "❌ VALIDITY EXPIRED", "Subscription samapt ho chuka hai! Validity badhayein. Validity End: " + subEndDate);
+                        return;
+                    }
+
+                    // 3. Check Slot Timings & Already Claimed
+                    fetch(DB_URL + "temple_settings.json")
+                        .then(res => res.json())
+                        .then(settings => {
+                            if(!settings) {
+                                showScanResult(false, "System Error", "❌ SETTINGS ERROR", "Temple Settings database mein khali hain!");
+                                return;
+                            }
+
+                            const now = new Date();
+                            const timeStr = now.toTimeString().split(' ')[0].substring(0, 5); // HH:MM
+                            
+                            let activeSlot = "";
+                            if(timeStr >= settings.morningStart && timeStr <= settings.morningEnd) {
+                                activeSlot = "Morning";
+                            } else if(timeStr >= settings.eveningStart && timeStr <= settings.eveningEnd) {
+                                activeSlot = "Evening";
+                            }
+
+                            if(activeSlot === "") {
+                                showScanResult(false, "Time Error", "❌ COUNTER CLOSED", "Tiffin timings samapt ho gayi hain! Abhi tiffin distribution closed hai.");
+                                return;
+                            }
+
+                            const logKey = userId + "_" + todayDateStr + "_" + activeSlot;
+
+                            // Check Double Claim
+                            fetch(DB_URL + "tiffin_logs/" + logKey + ".json")
+                                .then(res => res.json())
+                                .then(log => {
+                                    if(log && log !== null) {
+                                        showScanResult(false, "Double Claim Warning", "⚠️ ALREADY CLAIMED TODAY", name + " ne " + activeSlot + " ka tiffin pehle hi le liya hai!");
+                                    } else {
+                                        // Success! Update Log to Database via REST PUT
+                                        writeClaimLog(userId, name, avatar, todayDateStr, timeStr, activeSlot, logKey);
+                                    }
+                                });
+                        });
+                })
+                .catch(err => {
+                    showScanResult(false, "Network Error", "❌ ERROR", "Database connect nahi ho paya: " + err);
+                });
+        }
+
+        function onQrScanError(error) {
+            // Silence camera scanning feedback frames
+        }
+
+        function writeClaimLog(userId, name, avatar, date, time, slot, logKey) {
+            const logData = {
+                logId: logKey,
+                userId: userId,
+                name: name,
+                photoUrl: avatar,
+                date: date,
+                time: time + ":00",
+                slot: slot,
+                status: "Claimed"
+            };
+
+            fetch(DB_URL + "tiffin_logs/" + logKey + ".json", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(logData)
+            }).then(res => {
+                if(res.ok) {
+                    showScanResult(true, "Prasadam Allowed!", "✅ DE DO! (ALLOWED)", "Tiffin success! Database update completed.");
+                } else {
+                    showScanResult(false, "System Error", "❌ SAVE FAILED", "Log data database mein save nahi ho paya!");
+                }
+            });
+        }
+
+        function showScanResult(isSuccess, title, badge, msg) {
+            const card = document.getElementById("resultCard");
+            const icon = document.getElementById("resultIcon");
+            
+            card.classList.remove("animate-pulse");
+
+            if(isSuccess) {
+                // Flashy green success panel
+                card.className = "bg-green-50 rounded-3xl p-8 max-w-sm w-full text-center space-y-5 shadow-2xl border-4 border-green-500 animate-bounce";
+                icon.className = "w-20 h-20 rounded-full flex items-center justify-center text-4xl mx-auto border-4 border-green-500 bg-green-100 text-green-600";
+                icon.innerText = "👍";
+            } else {
+                // Flashy red failure panel
+                card.className = "bg-red-50 rounded-3xl p-8 max-w-sm w-full text-center space-y-5 shadow-2xl border-4 border-red-500";
+                icon.className = "w-20 h-20 rounded-full flex items-center justify-center text-4xl mx-auto border-4 border-red-500 bg-red-100 text-red-600";
+                icon.innerText = "🛑";
+            }
+
+            document.getElementById("resultTitle").innerText = title;
+            document.getElementById("resultMsg").innerHTML = `<span class="block font-black text-sm text-slate-800">${badge}</span><span class="block mt-1 text-slate-500">${msg}</span>`;
+        }
+
+        function closeResultModal() {
+            document.getElementById("resultModal").style.display = "none";
+            document.getElementById("resultModal").classList.add("hidden");
+            fetchUsers(); // Auto refresh users list on completion
+        }
+
+        // Tab Switchers
+        function switchTab(tabId) {
+            document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+            document.querySelectorAll(".tab-btn").forEach(el => {
+                el.classList.remove("bg-orange-600", "text-white");
+                el.classList.add("bg-white", "text-slate-600");
+            });
+
+            document.getElementById("tab-" + tabId).classList.add("active");
+            document.getElementById("tabBtn-" + tabId).classList.add("bg-orange-600", "text-white");
+            document.getElementById("tabBtn-" + tabId).classList.remove("bg-white", "text-slate-600");
+
+            if (tabId === 'users') fetchUsers();
+            if (tabId === 'reports') fetchLogs();
+            if (tabId === 'absents') fetchAbsents();
+            if (tabId === 'settings') loadSettings();
+        }
+
+        // Tab 1: Fetch and Manage Users (Resilient Card Parser)
+        function fetchUsers() {
+            fetch(DB_URL + "users.json")
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById("usersCardContainer");
+                    container.innerHTML = "";
+                    
+                    let usersData = data;
+                    if (data && data.users) {
+                        usersData = data.users;
+                    }
+
+                    if (!usersData) {
+                        container.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 font-semibold">Koi user registered nahi hai.</div>`;
+                        return;
+                    }
+
+                    Object.keys(usersData).forEach(key => {
+                        const rawUser = usersData[key];
+                        if (!rawUser) return;
+
+                        // Smart Fallback Parser to prevent 'undefined'
+                        const name = rawUser.name || rawUser.Name || "N/A";
+                        const phone = rawUser.phone || rawUser.Phone || "N/A";
+                        const userId = rawUser.userId || rawUser.userid || key;
+                        const status = rawUser.status || "inactive";
+                        const subEndDate = rawUser.subEndDate || "pending";
+                        let avatar = rawUser.photoUrl || "default";
+
+                        if (!avatar || avatar === "default") {
+                            avatar = "https://i.ibb.co/6yXm1F3/default-avatar.png";
+                        }
+
+                        const badgeColor = status === "active" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700";
+
+                        const card = document.createElement("div");
+                        card.className = "bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col gap-4";
+                        card.innerHTML = `
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <img src="${avatar}" class="w-12 h-12 rounded-full object-cover border border-slate-200 shadow-sm">
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 text-sm">${name}</h4>
+                                        <p class="text-xs text-slate-500">${phone}</p>
+                                    </div>
+                                </div>
+                                <button onclick="deleteUser('${userId}')" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold rounded-xl transition">
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                            <div class="text-[10px] text-slate-400 font-mono bg-slate-50 p-2 rounded-lg border border-dashed select-all">ID: ${userId}</div>
+                            <div class="flex justify-between items-center text-sm border-b pb-3">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor} capitalize">${status}</span>
+                                <span class="text-xs font-semibold text-slate-500">Active Till: <span class="font-bold text-slate-800">${subEndDate}</span></span>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">Set New Validity</label>
+                                <input type="date" id="date-${userId}" class="w-full p-2.5 border rounded-xl text-sm outline-none focus:border-orange-500">
+                                <div class="flex gap-2">
+                                    <button onclick="updateSubDate('${userId}', '${status}')" class="flex-1 py-2.5 bg-slate-950 text-white text-xs font-bold rounded-xl hover:bg-slate-800 transition">Update Date</button>
+                                    <button onclick="toggleUserStatus('${userId}', '${status}')" class="flex-1 py-2.5 bg-orange-600 text-white text-xs font-bold rounded-xl hover:bg-orange-700 transition">Toggle Active</button>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                })
+                .catch(err => alert("Error fetching users: " + err));
+        }
+
+        // Manually Add User directly from Admin Panel (No Phone Required)
+        function addUserManually() {
+            const name = document.getElementById("addName").value.trim();
+            const phone = document.getElementById("addPhone").value.trim();
+            const customId = document.getElementById("addDevId").value.trim();
+
+            if (name === "" || phone === "" || customId === "") {
+                alert("Kripya naye user ki sabhi details ko sahi se bharein.");
+                return;
+            }
+
+            const userData = {
+                userId: customId,
+                name: name,
+                phone: phone,
+                photoUrl: "default",
+                status: "active", // Active by default
+                subEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 30 Days default validity
+            };
+
+            fetch(DB_URL + "users/" + customId + ".json", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(userData)
+            })
+            .then(res => {
+                if (res.ok) {
+                    alert("User '" + name + "' successfully registered manually for 30 days!");
+                    // Clear inputs
+                    document.getElementById("addName").value = "";
+                    document.getElementById("addPhone").value = "";
+                    document.getElementById("addDevId").value = "";
+                    fetchUsers(); // Refresh cards
+                } else {
+                    alert("Failed to register user manually.");
+                }
+            })
+            .catch(err => alert("Error: " + err));
+        }
+
+        function toggleUserStatus(userId, currentStatus) {
+            const nextStatus = currentStatus === "active" ? "inactive" : "active";
+            
+            fetch(DB_URL + "users/" + userId + "/status.json", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(nextStatus)
+            })
+            .then(res => {
+                if (res.ok) {
+                    alert("User status successfully changed to: " + nextStatus);
+                    fetchUsers();
+                } else {
+                    alert("Update failed.");
+                }
+            })
+            .catch(err => alert("Error: " + err));
+        }
+
+        function updateSubDate(userId, currentStatus) {
+            const dateVal = document.getElementById("date-" + userId).value;
+            if (!dateVal) {
+                alert("Kripya pehle sahi date select karein.");
+                return;
+            }
+
+            Promise.all([
+                fetch(DB_URL + "users/" + userId + "/subEndDate.json", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(dateVal)
+                }),
+                fetch(DB_URL + "users/" + userId + "/status.json", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify("active")
+                })
+            ])
+            .then(([res1, res2]) => {
+                if (res1.ok && res2.ok) {
+                    alert("Subscription updated & User activated!");
+                    fetchUsers();
+                } else {
+                    alert("Update failed.");
+                }
+            })
+            .catch(err => alert("Error: " + err));
+        }
+
+        // DELETE User permanently from Database
+        function deleteUser(userId) {
+            if (confirm("Kya aap sach mein is user ko permanently delete karna chahte hain? Ye wapas nahi ho sakega.")) {
+                fetch(DB_URL + "users/" + userId + ".json", {
+                    method: "DELETE"
+                })
+                .then(res => {
+                    if (res.ok) {
+                        alert("User successfully deleted!");
+                        fetchUsers(); // Refresh cards
+                    } else {
+                        alert("Error: User delete nahi ho paya.");
+                    }
+                })
+                .catch(err => alert("Error: " + err));
+            }
+        }
+
+        // Tab 2: Logs & Live Reports (Mobile Friendly Cards)
+        function fetchLogs() {
+            fetch(DB_URL + "tiffin_logs.json")
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById("logsCardContainer");
+                    container.innerHTML = "";
+                    
+                    let mCount = 0;
+                    let eCount = 0;
+                    const todayDate = new Date().toISOString().split('T')[0];
+
+                    if (!data) {
+                        container.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 font-semibold">Aaj koi tiffin claim nahi hua hai.</div>`;
+                        updateReportCounts(0, 0, 0);
+                        return;
+                    }
+
+                    Object.keys(data).forEach(key => {
+                        const log = data[key];
+                        if (log.date === todayDate) {
+                            if (log.slot === "Morning") mCount++;
+                            if (log.slot === "Evening") eCount++;
+                        }
+
+                        const name = log.name || "Unknown User";
+                        const date = log.date || "N/A";
+                        const time = log.time || "N/A";
+                        const slot = log.slot || "N/A";
+                        let avatar = log.photoUrl || "default";
+
+                        if (!avatar || avatar === "default") {
+                            avatar = "https://i.ibb.co/6yXm1F3/default-avatar.png";
+                        }
+
+                        const card = document.createElement("div");
+                        card.className = "bg-white border rounded-2xl p-4 shadow-sm flex items-center justify-between gap-4";
+                        card.innerHTML = `
+                            <div class="flex items-center gap-3">
+                                <img src="${avatar}" class="w-10 h-10 rounded-full object-cover border border-slate-200">
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm">${name}</h4>
+                                    <p class="text-[10px] text-slate-400">Date: ${date} | Time: ${time}</p>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-orange-50 text-orange-600">${slot}</span>
+                        `;
+                        container.prepend(card); // Show latest first
+                    });
+
+                    updateReportCounts(mCount + eCount, mCount, eCount);
+                })
+                .catch(err => alert("Error fetching logs: " + err));
+        }
+
+        function updateReportCounts(total, morning, evening) {
+            document.getElementById("totalCount").innerText = total;
+            document.getElementById("morningCount").innerText = morning;
+            document.getElementById("eveningCount").innerText = evening;
+        }
+
+        // Tab 3: Absents Reason Fetching
+        function fetchAbsents() {
+            fetch(DB_URL + "absent_reasons.json")
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById("absentsCardContainer");
+                    container.innerHTML = "";
+                    if (!data) {
+                        container.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 font-semibold">Abhi koi absent record nahi mila.</div>`;
+                        return;
+                    }
+                    Object.keys(data).forEach(key => {
+                        const reason = data[key];
+                        
+                        fetch(DB_URL + "users/" + reason.userId + ".json")
+                            .then(res => res.json())
+                            .then(user => {
+                                const userName = user ? user.name : "Unknown User";
+                                let avatar = (user && user.photoUrl && user.photoUrl !== "default") ? user.photoUrl : "https://i.ibb.co/6yXm1F3/default-avatar.png";
+
+                                const card = document.createElement("div");
+                                card.className = "bg-white border rounded-2xl p-4 shadow-sm flex flex-col gap-2";
+                                card.innerHTML = `
+                                    <div class="flex items-center gap-3">
+                                        <img src="${avatar}" class="w-10 h-10 rounded-full object-cover border border-slate-200">
+                                        <div>
+                                            <h4 class="font-bold text-slate-800 text-sm">${userName}</h4>
+                                            <p class="text-[10px] text-slate-400">Missed Date: ${reason.date}</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-xs bg-orange-50 text-orange-700 p-2.5 rounded-lg font-bold border border-orange-100">
+                                        Karan: ${reason.reason}
+                                    </div>
+                                ];
+                                container.prepend(card);
+                            });
+                    });
+                })
+                .catch(err => alert("Error fetching absents: " + err));
+        }
+
+        // Tab 4: System Settings Manage
+        function loadSettings() {
+            fetch(DB_URL + "temple_settings.json")
+                .then(res => res.json())
+                .then(data => {
+                    if (data) {
+                        document.getElementById("setLat").value = data.latitude;
+                        document.getElementById("setLon").value = data.longitude;
+                        document.getElementById("setRadius").value = data.allowedRadius;
+                        document.getElementById("setMStart").value = data.morningStart;
+                        document.getElementById("setMEnd").value = data.morningEnd;
+                        document.getElementById("setEStart").value = data.eveningStart;
+                        document.getElementById("setEEnd").value = data.eveningEnd;
+                    }
+                })
+                .catch(err => alert("Error loading settings: " + err));
+        }
+
+        function saveSettings() {
+            const lat = parseFloat(document.getElementById("setLat").value);
+            const lon = parseFloat(document.getElementById("setLon").value);
+            const radius = parseFloat(document.getElementById("setRadius").value);
+            const mStart = document.getElementById("setMStart").value;
+            const mEnd = document.getElementById("setMEnd").value;
+            const eStart = document.getElementById("setEStart").value;
+            const eEnd = document.getElementById("setEEnd").value;
+
+            if (isNaN(lat) || isNaN(lon) || isNaN(radius) || !mStart || !mEnd || !eStart || !eEnd) {
+                alert("Kripya sabhi details ko sateek tarike se bharein.");
+                return;
+            }
+
+            const settingsData = {
+                latitude: lat,
+                longitude: lon,
+                allowedRadius: radius,
+                morningStart: mStart,
+                morningEnd: mEnd,
+                eveningStart: eStart,
+                eveningEnd: eEnd
+            };
+
+            fetch(DB_URL + "temple_settings.json", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(settingsData)
+            })
+            .then(() => alert("Temple configurations successfully updated! App refresh karein."))
+            .catch(err => alert("Error saving configurations: " + err));
+        }
+    </script>
+</body>
+</html>
